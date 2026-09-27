@@ -21,6 +21,16 @@ function App() {
     checkAuth();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await api.post('/api/auth/logout');
+    } catch (error) {
+      console.error('Logout error', error);
+    } finally {
+      setUser(null);
+    }
+  };
+
   if (loading) {
     return <div>Carregando...</div>;
   }
@@ -29,7 +39,7 @@ function App() {
     return <Login onLoginSuccess={setUser} />;
   }
 
-  return <Home />;
+  return <Home user={user} onLogout={handleLogout} />;
 }
 
 export default App;

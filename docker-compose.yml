@@ -16,6 +16,8 @@ services:
       context: ./backend
     ports:
       - "3000:3000"
+    env_file:
+      - ./backend/.env
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/controlegastos?schema=public
     depends_on:
@@ -29,6 +31,8 @@ services:
       context: ./frontend
     ports:
       - "5173:5173"
+    env_file:
+      - ./frontend/.env
     environment:
       - VITE_API_URL=http://localhost:3000
     volumes:
