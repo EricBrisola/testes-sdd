@@ -1,4 +1,5 @@
-import { Container, Title, UserCard, LogoutButton, UserInfo } from './Home.styles';
+import { Container, Title, UserCard, LogoutButton, UserInfo, FeedbackMessage, MovimentacaoFormWrapper } from './styles.ts';
+import MovimentacaoForm from '../components/MovimentacaoForm';
 
 interface User {
   id: string;
@@ -22,9 +23,14 @@ export default function Home({ user, onLogout }: HomeProps) {
         </UserInfo>
         <LogoutButton onClick={onLogout}>Sair da conta</LogoutButton>
       </UserCard>
-      <p style={{ marginTop: '20px', color: '#666', fontSize: '0.9rem' }}>
-        Autenticação realizada com sucesso. Sessão protegida via cookie HttpOnly.
-      </p>
+
+      <MovimentacaoFormWrapper>
+        <MovimentacaoForm />
+      </MovimentacaoFormWrapper>
+
+      <FeedbackMessage>
+        Autenticação realizada com sucesso.
+      </FeedbackMessage>
     </Container>
   );
 }
