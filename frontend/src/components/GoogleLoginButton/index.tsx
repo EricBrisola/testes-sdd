@@ -1,10 +1,11 @@
 import { GoogleLogin } from '@react-oauth/google';
 import type { CredentialResponse } from '@react-oauth/google';
 import { api } from '../../services/api';
+import type { User } from '../../types/user';
 import { Container } from './styles';
 
 interface GoogleLoginButtonProps {
-  onSuccess: (user: any) => void;
+  onSuccess: (user: User) => void;
   onError: () => void;
 }
 

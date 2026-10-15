@@ -6,9 +6,11 @@ export default {
     "^.+\\.tsx?$": [
       "ts-jest",
       {
+        diagnostics: false,
         tsconfig: {
           jsx: "react-jsx",
-          module: "esnext",
+          module: "commonjs",
+          target: "es2020",
           moduleResolution: "node",
           verbatimModuleSyntax: false,
           esModuleInterop: true,

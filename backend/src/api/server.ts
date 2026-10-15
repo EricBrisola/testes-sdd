@@ -4,17 +4,23 @@ import cors from '@fastify/cors';
 import jwtPlugin from '../plugins/jwt';
 import authRoutes from './routes/auth.routes';
 import usersRoutes from './routes/users.routes';
+import movimentacoesRoutes from './routes/movimentacoes.routes';
+import categoriasRoutes from './routes/categorias.routes';
 
 const server = Fastify({ logger: true });
 
 server.register(cors, {
   origin: 'http://localhost:5173',
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 });
 
 server.register(jwtPlugin);
 server.register(authRoutes);
 server.register(usersRoutes);
+server.register(movimentacoesRoutes, { prefix: '/api/movimentacoes' });
+server.register(categoriasRoutes, { prefix: '/api/categorias' });
 
 server.get('/health', async (request, reply) => {
   return { status: 'ok', service: 'Controle de Gastos API' };

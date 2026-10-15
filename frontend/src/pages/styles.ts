@@ -60,3 +60,14 @@ export const LogoutButton = styled.button`
     background-color: #dc2626;
   }
 `;
+
+export const FeedbackMessage = styled.p`
+  margin-top: 20px;
+  color: #666;
+  font-size: 0.9rem;
+`;
+
+export const MovimentacaoFormWrapper = styled.div`
+  margin-top: 2rem;
+  width: 100%;
+`;

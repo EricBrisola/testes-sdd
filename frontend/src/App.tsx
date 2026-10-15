@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { api } from './services/api';
+import type { User } from './types/user';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import CategoriasPage from './pages/Categorias';
 
 function App() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await api.get('/api/users/me');
+        const response = await api.get<User>('/api/users/me');
         setUser(response.data);
-      } catch (error) {
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
@@ -39,7 +42,15 @@ function App() {
     return <Login onLoginSuccess={setUser} />;
   }
 
-  return <Home user={user} onLogout={handleLogout} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home user={user} onLogout={handleLogout} />} />
+        <Route path="/categorias" element={<CategoriasPage user={user} onLogout={handleLogout} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

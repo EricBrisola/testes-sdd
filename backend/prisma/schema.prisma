@@ -9,12 +9,57 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  nome      String
-  google_id String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String         @id @default(uuid())
+  email         String         @unique
+  nome          String
+  google_id     String         @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  categorias    Categoria[]
+  movimentacoes Movimentacao[]
 
   @@map("users")
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+}
+
+enum MetodoPagamento {
+  PIX
+  DINHEIRO
+  CARTAO
+}
+
+model Categoria {
+  id            String         @id @default(uuid())
+  nome          String
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movimentacoes Movimentacao[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("categorias")
+}
+
+model Movimentacao {
+  id              String           @id @default(uuid())
+  nome            String
+  valor           Decimal          @db.Decimal(10, 2)
+  data            DateTime
+  tipo            TipoMovimentacao
+  metodoPagamento MetodoPagamento
+  
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  categoriaId     String
+  categoria       Categoria        @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("movimentacoes")
 }

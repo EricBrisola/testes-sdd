@@ -21,7 +21,14 @@ export async function verifyGoogleTokenAndGetUser(token: string) {
       data: {
         email: payload.email,
         nome: payload.name || 'User',
-        google_id: payload.sub
+        google_id: payload.sub,
+        categorias: {
+          create: [
+            { nome: 'Alimentação' },
+            { nome: 'Geral' },
+            { nome: 'Lazer' }
+          ]
+        }
       }
     });
   }

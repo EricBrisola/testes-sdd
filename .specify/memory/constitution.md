@@ -1,7 +1,7 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
-- Modified sections: Aligned principles strictly with the requested Quality, Architecture, and Design rules.
+- Version change: 1.1.0 → 1.2.0
+- Modified sections: Added new Workflow rule requiring a new branch for each spec created.
 -->
 # Constitution
 
@@ -21,7 +21,11 @@ Sync Impact Report:
 ### III. Design
 - **Responsiveness**: All components MUST be fully responsive and work flawlessly on mobile devices.
 
+### IV. Workflow
+- **Git Branching**: A new Git branch MUST be created for each new Spec (feature) created in the project. The branch name MUST follow the format `<spec-number>-<feature-name>` (e.g., `003-user-dashboard`).
+- **No Deprecated Code**: NEVER use APIs, libraries, types, or features that are marked as deprecated. Always utilize the modern approaches recommended by their respective documentations.
+
 ## Governance
 This Constitution supersedes all other practices and guidelines. Amendments require proper documentation, explicit approval, and a clear migration plan. All Pull Requests and code reviews MUST explicitly verify compliance with these principles.
 
-**Version**: 1.1.0 | **Ratified**: 2026-09-10 | **Last Amended**: 2026-09-10
+**Version**: 1.2.0 | **Ratified**: 2026-09-10 | **Last Amended**: 2026-10-08
