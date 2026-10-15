@@ -13,6 +13,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
       
       const jwtToken = fastify.jwt.sign({ 
         id: user.id, 
+        sub: user.id,
         email: user.email, 
         nome: user.nome 
       });

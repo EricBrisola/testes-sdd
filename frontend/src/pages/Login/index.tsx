@@ -1,8 +1,9 @@
 import { Container, LoginCard, Title, Subtitle } from './styles';
 import { GoogleLoginButton } from '../../components/GoogleLoginButton';
+import type { User } from '../../types/user';
 
 interface LoginProps {
-  onLoginSuccess: (user: any) => void;
+  onLoginSuccess: (user: User) => void;
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {

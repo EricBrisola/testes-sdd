@@ -1,36 +1,24 @@
-import { Container, Title, UserCard, LogoutButton, UserInfo, FeedbackMessage, MovimentacaoFormWrapper } from './styles.ts';
+import { Container, Title, MovimentacaoFormWrapper } from './styles';
 import MovimentacaoForm from '../components/MovimentacaoForm';
+import Navbar from '../components/Navbar';
+import type { User } from '../types/user';
 
-interface User {
-  id: string;
-  nome: string;
-  email: string;
-}
-
-interface HomeProps {
+export interface HomeProps {
   user?: User | null;
   onLogout?: () => void;
 }
 
 export default function Home({ user, onLogout }: HomeProps) {
   return (
-    <Container>
-      <Title>Controle de Gastos</Title>
-      <UserCard>
-        <UserInfo>
-          <h2>Olá, {user?.nome || 'Usuário'}! 👋</h2>
-          <p>{user?.email}</p>
-        </UserInfo>
-        <LogoutButton onClick={onLogout}>Sair da conta</LogoutButton>
-      </UserCard>
+    <>
+      <Navbar user={user} onLogout={onLogout} />
+      <Container>
+        <Title>Controle de Gastos</Title>
 
-      <MovimentacaoFormWrapper>
-        <MovimentacaoForm />
-      </MovimentacaoFormWrapper>
-
-      <FeedbackMessage>
-        Autenticação realizada com sucesso.
-      </FeedbackMessage>
-    </Container>
+        <MovimentacaoFormWrapper>
+          <MovimentacaoForm />
+        </MovimentacaoFormWrapper>
+      </Container>
+    </>
   );
 }

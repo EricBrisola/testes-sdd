@@ -1,11 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Input from '../Input';
 import Select from '../Select';
-import { FormContainer, FormTitle, Button, SuccessMessage, ErrorMessage, Row } from './styles';
-import axios from 'axios';
-
-// As Categorias deveriam vir do backend, porém para o MVP podemos usar um mockup ou criar uma hardcoded
-const MOCK_CATEGORIA_ID = 'mock-categoria-123'; // Ideal seria fazer GET /api/categorias
+import { api } from '../../services/api';
+import { listarCategorias } from '../../services/categoria.service';
+import type { Categoria } from '../../types/categoria';
+import {
+  FormContainer,
+  FormTitle,
+  Button,
+  SuccessMessage,
+  ErrorMessage,
+  Row,
+  CategoryRow,
+  CategoryEmptyLink
+} from './styles';
 
 interface FormData {
   nome: string;
@@ -13,6 +21,7 @@ interface FormData {
   data: string;
   tipo: string;
   metodoPagamento: string;
+  categoriaId: string;
 }
 
 export default function MovimentacaoForm() {
@@ -21,15 +30,40 @@ export default function MovimentacaoForm() {
     valor: '',
     data: new Date().toISOString().split('T')[0],
     tipo: 'ENTRADA',
-    metodoPagamento: 'PIX'
+    metodoPagamento: 'PIX',
+    categoriaId: ''
   });
-  
+
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [loadingCategorias, setLoadingCategorias] = useState(true);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const carregarCategorias = async () => {
+      try {
+        setLoadingCategorias(true);
+        const data = await listarCategorias();
+        setCategorias(data);
+        if (data.length > 0) {
+          setFormData((prev) => ({
+            ...prev,
+            categoriaId: prev.categoriaId || data[0].id
+          }));
+        }
+      } catch {
+        setError('Não foi possível carregar as categorias.');
+      } finally {
+        setLoadingCategorias(false);
+      }
+    };
+
+    carregarCategorias();
+  }, []);
+
   const handleChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const submitAction = async () => {
@@ -43,26 +77,35 @@ export default function MovimentacaoForm() {
       return;
     }
 
+    if (!formData.categoriaId) {
+      setError('Por favor, selecione uma categoria para a movimentação.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:3000/api/movimentacoes', {
+      await api.post('/api/movimentacoes', {
         nome: formData.nome,
-        valor: Math.abs(parseFloat(formData.valor)), // Valor absoluto garantido
+        valor: Math.abs(parseFloat(formData.valor)),
         data: new Date(formData.data).toISOString(),
         tipo: formData.tipo,
         metodoPagamento: formData.metodoPagamento,
-        categoriaId: MOCK_CATEGORIA_ID
-      }, {
-        withCredentials: true // Importante para enviar o HttpOnly Cookie JWT
+        categoriaId: formData.categoriaId
       });
 
       setSuccess(true);
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         nome: '',
         valor: ''
-      });
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao salvar a movimentação.');
+      }));
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { data?: { message?: string } } };
+        setError(axiosError.response?.data?.message || 'Erro ao salvar a movimentação.');
+      } else {
+        setError('Erro ao salvar a movimentação.');
+      }
     } finally {
       setLoading(false);
     }
@@ -71,12 +114,12 @@ export default function MovimentacaoForm() {
   return (
     <FormContainer action={submitAction}>
       <FormTitle>Nova Movimentação</FormTitle>
-      
+
       {success && <SuccessMessage>Movimentação salva com sucesso!</SuccessMessage>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      <Input 
-        label="Nome (ex: Salário, Padaria)" 
+      <Input
+        label="Nome (ex: Salário, Padaria)"
         type="text"
         placeholder="Nome da movimentação"
         value={formData.nome}
@@ -85,8 +128,8 @@ export default function MovimentacaoForm() {
       />
 
       <Row>
-        <Input 
-          label="Valor (R$)" 
+        <Input
+          label="Valor (R$)"
           type="number"
           step="0.01"
           min="0.01"
@@ -95,8 +138,8 @@ export default function MovimentacaoForm() {
           onChange={(e) => handleChange('valor', e.target.value)}
           required
         />
-        <Input 
-          label="Data" 
+        <Input
+          label="Data"
           type="date"
           value={formData.data}
           onChange={(e) => handleChange('data', e.target.value)}
@@ -104,8 +147,27 @@ export default function MovimentacaoForm() {
         />
       </Row>
 
+      <CategoryRow>
+        <Select
+          label="Categoria"
+          value={formData.categoriaId}
+          onChange={(e) => handleChange('categoriaId', e.target.value)}
+          options={
+            categorias.length > 0
+              ? categorias.map((cat) => ({ value: cat.id, label: cat.nome }))
+              : [{ value: '', label: loadingCategorias ? 'Carregando categorias...' : 'Nenhuma categoria cadastrada' }]
+          }
+          disabled={loadingCategorias || categorias.length === 0}
+        />
+        {!loadingCategorias && categorias.length === 0 && (
+          <CategoryEmptyLink to="/categorias">
+            Você ainda não tem categorias. Clique aqui para cadastrar →
+          </CategoryEmptyLink>
+        )}
+      </CategoryRow>
+
       <Row>
-        <Select 
+        <Select
           label="Tipo"
           value={formData.tipo}
           onChange={(e) => handleChange('tipo', e.target.value)}
@@ -114,7 +176,7 @@ export default function MovimentacaoForm() {
             { value: 'SAIDA', label: 'Saída (Despesa)' }
           ]}
         />
-        <Select 
+        <Select
           label="Método de Pagamento"
           value={formData.metodoPagamento}
           onChange={(e) => handleChange('metodoPagamento', e.target.value)}
@@ -126,7 +188,7 @@ export default function MovimentacaoForm() {
         />
       </Row>
 
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading || loadingCategorias || categorias.length === 0}>
         {loading ? 'Salvando...' : 'Salvar Movimentação'}
       </Button>
     </FormContainer>

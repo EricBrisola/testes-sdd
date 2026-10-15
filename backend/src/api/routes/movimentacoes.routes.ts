@@ -13,7 +13,12 @@ export default async function movimentacoesRoutes(fastify: FastifyInstance) {
 
   fastify.post('/', async (request: FastifyRequest, reply: FastifyReply) => {
     const { nome, valor, data, tipo, metodoPagamento, categoriaId } = request.body as Omit<CriarMovimentacaoDTO, 'userId'>;
-    const user = request.user as { sub: string };
+    const user = request.user as { id?: string; sub?: string } | undefined;
+    const userId = user?.id || user?.sub;
+
+    if (!userId) {
+      return reply.status(401).send({ message: 'Não autorizado' });
+    }
 
     if (!nome || !valor || !data || !tipo || !metodoPagamento || !categoriaId) {
       return reply.status(400).send({ message: 'Todos os campos são obrigatórios' });
@@ -31,7 +36,7 @@ export default async function movimentacoesRoutes(fastify: FastifyInstance) {
         tipo,
         metodoPagamento,
         categoriaId,
-        userId: user.sub // userId extraído do JWT Token
+        userId
       });
 
       return reply.status(201).send(movimentacao);

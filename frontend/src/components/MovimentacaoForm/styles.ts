@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 export const FormContainer = styled.form`
   display: flex;
@@ -11,6 +12,7 @@ export const FormContainer = styled.form`
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
+  box-sizing: border-box;
 `;
 
 export const FormTitle = styled.h2`
@@ -26,6 +28,27 @@ export const Row = styled.div`
   
   @media (max-width: 480px) {
     flex-direction: column;
+  }
+`;
+
+export const CategoryRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+`;
+
+export const CategoryEmptyLink = styled(Link)`
+  font-size: 0.8rem;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  &:hover {
+    text-decoration: underline;
   }
 `;
 

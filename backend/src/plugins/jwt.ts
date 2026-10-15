@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCookie from '@fastify/cookie';
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 export default fp(async (fastify: FastifyInstance) => {
   fastify.register(fastifyJwt, {
@@ -17,10 +17,10 @@ export default fp(async (fastify: FastifyInstance) => {
     parseOptions: {}
   });
 
-  fastify.decorate('authenticate', async function (request: any, reply: any) {
+  fastify.decorate('authenticate', async function (request: FastifyRequest, reply: FastifyReply) {
     try {
       await request.jwtVerify();
-    } catch (err) {
+    } catch {
       reply.status(401).send({ message: 'Unauthorized' });
     }
   });
@@ -28,6 +28,6 @@ export default fp(async (fastify: FastifyInstance) => {
 
 declare module 'fastify' {
   interface FastifyInstance {
-    authenticate: any;
+    authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 }
