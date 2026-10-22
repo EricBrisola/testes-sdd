@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { api } from './services/api';
 import type { User } from './types/user';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import CategoriasPage from './pages/Categorias';
+import MovimentacoesPage from './pages/Movimentacoes';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -44,8 +47,10 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ToastContainer position="top-right" autoClose={3500} hideProgressBar={false} />
       <Routes>
         <Route path="/" element={<Home user={user} onLogout={handleLogout} />} />
+        <Route path="/movimentacoes" element={<MovimentacoesPage user={user} onLogout={handleLogout} />} />
         <Route path="/categorias" element={<CategoriasPage user={user} onLogout={handleLogout} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
