@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import CategoriasPage from './pages/Categorias';
 import MovimentacoesPage from './pages/Movimentacoes';
+import DashboardPage from './pages/Dashboard';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -52,6 +53,7 @@ function App() {
         <Route path="/" element={<Home user={user} onLogout={handleLogout} />} />
         <Route path="/movimentacoes" element={<MovimentacoesPage user={user} onLogout={handleLogout} />} />
         <Route path="/categorias" element={<CategoriasPage user={user} onLogout={handleLogout} />} />
+        <Route path="/dashboard" element={<DashboardPage user={user} onLogout={handleLogout} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
