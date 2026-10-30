@@ -1,7 +1,16 @@
 import styled from 'styled-components';
 
+export const PageWrapper = styled.div`
+  min-height: 100vh;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
 export const PageContainer = styled.main`
   max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
   box-sizing: border-box;

@@ -1,13 +1,21 @@
 import styled from 'styled-components';
 
+export const PageWrapper = styled.div`
+  min-height: 100vh;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
 export const PageContainer = styled.main`
   display: flex;
   flex-direction: column;
   gap: 2rem;
   padding: 2rem 1rem;
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
-  min-height: 100vh;
   box-sizing: border-box;
 
   @media (max-width: 640px) {

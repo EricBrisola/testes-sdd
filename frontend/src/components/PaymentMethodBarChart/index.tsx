@@ -65,7 +65,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
 }
 
 export default function PaymentMethodBarChart({ metodos, tipoFiltro }: PaymentMethodBarChartProps) {
-  const tituloNatureza = tipoFiltro === 'SAIDA' ? 'Despesas' : 'Entradas';
+  const tituloNatureza = tipoFiltro === 'SAIDA' ? 'Despesas' : 'Receitas';
   const hasData = metodos && metodos.length > 0 && metodos.some((m) => m.valor > 0);
 
   const pixItem = metodos.find((m) => m.metodo === 'PIX');

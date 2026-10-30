@@ -19,6 +19,7 @@ import MovimentacoesFilters from '../../components/MovimentacoesFilters';
 import ConfirmDeleteModal from '../../components/ConfirmDeleteModal';
 import MovimentacaoEditModal from '../../components/MovimentacaoEditModal';
 import {
+  PageWrapper,
   PageContainer,
   PageHeader,
   TitleBox,
@@ -120,7 +121,7 @@ export default function MovimentacoesPage({ user, onLogout }: MovimentacoesPageP
   };
 
   return (
-    <>
+    <PageWrapper>
       <Navbar user={user} onLogout={onLogout} />
       <PageContainer>
         <PageHeader>
@@ -254,6 +255,6 @@ export default function MovimentacoesPage({ user, onLogout }: MovimentacoesPageP
         onSave={handleSaveEdicao}
         onClose={() => setItemParaEditar(null)}
       />
-    </>
+    </PageWrapper>
   );
 }

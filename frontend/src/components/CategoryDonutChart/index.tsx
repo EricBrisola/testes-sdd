@@ -49,7 +49,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
 }
 
 export default function CategoryDonutChart({ categorias, tipoFiltro }: CategoryDonutChartProps) {
-  const tituloNatureza = tipoFiltro === 'SAIDA' ? 'Despesas' : 'Entradas';
+  const tituloNatureza = tipoFiltro === 'SAIDA' ? 'Despesas' : 'Receitas';
   const hasData = categorias && categorias.length > 0 && categorias.some((c) => c.valor > 0);
 
   return (

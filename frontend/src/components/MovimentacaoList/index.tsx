@@ -79,7 +79,7 @@ export default function MovimentacaoList({
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                           <polyline points="18 15 12 9 6 15" />
                         </svg>
-                        Entrada
+                        Receita
                       </>
                     ) : (
                       <>

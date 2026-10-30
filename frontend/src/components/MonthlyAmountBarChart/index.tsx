@@ -50,11 +50,11 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
             Montante Total: {formatarMoeda(item.montanteTotal)}
           </TooltipTotal>
           <TooltipRow $color="#4ade80">
-            <span>Entradas ({item.percentualEntradas}%):</span>
+            <span>Receitas ({item.percentualEntradas}%):</span>
             <span>{formatarMoeda(item.totalEntradas)}</span>
           </TooltipRow>
           <TooltipRow $color="#f87171">
-            <span>Saídas ({item.percentualSaidas}%):</span>
+            <span>Despesas ({item.percentualSaidas}%):</span>
             <span>{formatarMoeda(item.totalSaidas)}</span>
           </TooltipRow>
         </TooltipBox>
@@ -79,17 +79,17 @@ export default function MonthlyAmountBarChart({ dadosMensais }: MonthlyAmountBar
       <ChartHeader>
         <TitleContainer>
           <ChartTitle>Montante dos Últimos 6 Meses</ChartTitle>
-          <ChartSubtitle>Volume financeiro mensal proporcional em colunas verticais</ChartSubtitle>
+          <ChartSubtitle>Volume financeiro mensal proporcional</ChartSubtitle>
         </TitleContainer>
 
         <LegendContainer>
           <LegendBadge $color="#16a34a">
             <LegendDot $color="#16a34a" />
-            Entradas
+            Receitas
           </LegendBadge>
           <LegendBadge $color="#dc2626">
             <LegendDot $color="#dc2626" />
-            Saídas
+            Despesas
           </LegendBadge>
         </LegendContainer>
       </ChartHeader>
@@ -119,7 +119,7 @@ export default function MonthlyAmountBarChart({ dadosMensais }: MonthlyAmountBar
               <Tooltip content={<CustomTooltip />} />
               <Bar
                 dataKey="totalEntradas"
-                name="Entradas"
+                name="Receitas"
                 stackId="montante"
                 fill="#16a34a"
                 isAnimationActive={true}
@@ -128,7 +128,7 @@ export default function MonthlyAmountBarChart({ dadosMensais }: MonthlyAmountBar
               />
               <Bar
                 dataKey="totalSaidas"
-                name="Saídas"
+                name="Despesas"
                 stackId="montante"
                 fill="#dc2626"
                 isAnimationActive={true}
