@@ -32,6 +32,9 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
 
         <NavLinks>
           <StyledNavLink to="/" end>
+            Nova Movimentação
+          </StyledNavLink>
+          <StyledNavLink to="/movimentacoes">
             Movimentações
           </StyledNavLink>
           <StyledNavLink to="/categorias">
