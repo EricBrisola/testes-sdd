@@ -93,13 +93,14 @@ export const Select = styled.select`
   padding: 0.65rem 0.85rem;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
-  background-color: #f8fafc;
+  background-color: #ffffff;
   color: #1e293b;
   font-size: 0.9rem;
   font-weight: 500;
   outline: none;
   transition: all 0.15s ease-in-out;
   cursor: pointer;
+  color-scheme: light;
 
   &:focus {
     border-color: #2563eb;
@@ -135,12 +136,13 @@ export const InputDate = styled.input`
   padding: 0.55rem 0.65rem;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
-  background-color: #f8fafc;
+  background-color: #ffffff;
   color: #1e293b;
   font-size: 0.85rem;
   outline: none;
   transition: all 0.15s ease-in-out;
   box-sizing: border-box;
+  color-scheme: light;
 
   &:focus {
     border-color: #2563eb;
@@ -155,7 +157,7 @@ export const CheckboxGroupWrapper = styled.div`
   flex-direction: column;
   gap: 0.65rem;
   background-color: #f8fafc;
-  border: 1px solid #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 1rem;
 `;
@@ -180,6 +182,7 @@ export const CheckboxItem = styled.label`
   cursor: pointer;
   user-select: none;
   transition: all 0.15s ease-in-out;
+  color-scheme: light;
 
   &:hover {
     border-color: #94a3b8;
@@ -191,6 +194,7 @@ export const CheckboxItem = styled.label`
     width: 16px;
     height: 16px;
     accent-color: #2563eb;
+    color-scheme: light;
   }
 
   &.checked {

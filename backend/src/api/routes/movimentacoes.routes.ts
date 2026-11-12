@@ -9,6 +9,7 @@ import {
   AtualizarMovimentacaoDTO,
   AppError
 } from '../../services/movimentacoes.service';
+import { obterDadosDashboard } from '../../services/dashboard.service';
 
 interface ListarQuery {
   categorias?: string | string[];
@@ -117,6 +118,23 @@ export default async function movimentacoesRoutes(fastify: FastifyInstance) {
         return reply.status(error.statusCode).send({ message: error.message });
       }
       return reply.status(500).send({ message: 'Erro ao listar movimentações' });
+    }
+  });
+
+  // GET /api/movimentacoes/dashboard - Obter dados consolidados para o dashboard
+  fastify.get('/dashboard', async (request: FastifyRequest, reply: FastifyReply) => {
+    const user = request.user as { id?: string; sub?: string } | undefined;
+    const userId = user?.id || user?.sub;
+
+    if (!userId) {
+      return reply.status(401).send({ message: 'Não autorizado' });
+    }
+
+    try {
+      const dadosDashboard = await obterDadosDashboard(userId);
+      return reply.status(200).send(dadosDashboard);
+    } catch {
+      return reply.status(500).send({ message: 'Erro ao gerar dados do dashboard' });
     }
   });
 

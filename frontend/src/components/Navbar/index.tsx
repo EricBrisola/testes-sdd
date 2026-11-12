@@ -40,6 +40,9 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
           <StyledNavLink to="/categorias">
             Categorias
           </StyledNavLink>
+          <StyledNavLink to="/dashboard">
+            Dashboard
+          </StyledNavLink>
         </NavLinks>
 
         <RightSection>

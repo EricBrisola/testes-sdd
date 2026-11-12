@@ -1,7 +1,7 @@
 <!--
 Sync Impact Report:
-- Version change: 1.1.0 → 1.2.0
-- Modified sections: Added new Workflow rule requiring a new branch for each spec created.
+- Version change: 1.2.0 → 1.3.0
+- Modified sections: Added Docker Dependency Synchronization rule under Workflow.
 -->
 # Constitution
 
@@ -24,8 +24,9 @@ Sync Impact Report:
 ### IV. Workflow
 - **Git Branching**: A new Git branch MUST be created for each new Spec (feature) created in the project. The branch name MUST follow the format `<spec-number>-<feature-name>` (e.g., `003-user-dashboard`).
 - **No Deprecated Code**: NEVER use APIs, libraries, types, or features that are marked as deprecated. Always utilize the modern approaches recommended by their respective documentations.
+- **Docker Dependency Synchronization**: Whenever a new package or library is added to the project (frontend or backend), its installation MUST be executed directly inside the active Docker container (`docker compose exec <service> npm install`) or via container rebuild (`docker compose up -d --build <service>`), followed by restarting the container service (`docker compose restart <service>`). Installing dependencies solely on the host machine is strictly forbidden, as Docker anonymous volumes (`node_modules`) do not synchronize automatically with the host filesystem.
 
 ## Governance
 This Constitution supersedes all other practices and guidelines. Amendments require proper documentation, explicit approval, and a clear migration plan. All Pull Requests and code reviews MUST explicitly verify compliance with these principles.
 
-**Version**: 1.2.0 | **Ratified**: 2026-09-10 | **Last Amended**: 2026-10-08
+**Version**: 1.3.0 | **Ratified**: 2026-09-10 | **Last Amended**: 2026-10-30

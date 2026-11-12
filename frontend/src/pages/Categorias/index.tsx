@@ -7,6 +7,7 @@ import Navbar from '../../components/Navbar';
 import CategoriaForm from '../../components/CategoriaForm';
 import CategoriaTable from '../../components/CategoriaTable';
 import {
+  PageWrapper,
   PageContainer,
   PageHeader,
   TitleBox,
@@ -89,7 +90,7 @@ export default function CategoriasPage({ user, onLogout }: CategoriasPageProps) 
   };
 
   return (
-    <>
+    <PageWrapper>
       <Navbar user={user} onLogout={onLogout} />
       <PageContainer>
         <PageHeader>
@@ -117,6 +118,6 @@ export default function CategoriasPage({ user, onLogout }: CategoriasPageProps) 
           onClearError={() => setTableError('')}
         />
       </PageContainer>
-    </>
+    </PageWrapper>
   );
 }

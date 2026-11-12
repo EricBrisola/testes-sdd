@@ -139,16 +139,16 @@ export default function MovimentacoesFilters({
       </FilterHeader>
 
       <FilterGrid>
-        {/* Filtro por Natureza (Entrada / Despesa) */}
+        {/* Filtro por Natureza (Receita / Despesa) */}
         <FilterGroup>
-          <FilterLabel htmlFor="filtro-natureza">Fluxo (Entrada ou Despesa)</FilterLabel>
+          <FilterLabel htmlFor="filtro-natureza">Fluxo (Receita ou Despesa)</FilterLabel>
           <Select
             id="filtro-natureza"
             value={tipo}
             onChange={(e) => setTipo(e.target.value as TipoMovimentacao | '')}
           >
-            <option value="">Todas as Naturezas</option>
-            <option value="ENTRADA">Entrada</option>
+            <option value="">Todos Fluxos</option>
+            <option value="ENTRADA">Receita</option>
             <option value="SAIDA">Despesa</option>
           </Select>
         </FilterGroup>
