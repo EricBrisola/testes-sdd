@@ -58,8 +58,15 @@ model Movimentacao {
   categoriaId     String
   categoria       Categoria        @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
   
+  isParcela       Boolean          @default(false)
+  parcelamentoId  String?
+  numeroParcela   Int?
+  totalParcelas   Int?
+  
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
+  @@index([parcelamentoId])
+  @@index([userId, parcelamentoId])
   @@map("movimentacoes")
 }

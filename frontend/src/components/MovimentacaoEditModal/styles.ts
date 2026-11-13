@@ -78,6 +78,19 @@ export const ModalForm = styled.form`
   gap: 1.15rem;
 `;
 
+export const InstallmentNotice = styled.div`
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.825rem;
+  color: #1e40af;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
 export const FormGroup = styled.div`
   display: flex;
   flex-direction: column;

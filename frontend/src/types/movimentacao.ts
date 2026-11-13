@@ -12,8 +12,23 @@ export interface Movimentacao {
   metodoPagamento: MetodoPagamento;
   userId: string;
   categoriaId: string;
+  isParcela: boolean;
+  parcelamentoId?: string | null;
+  numeroParcela?: number | null;
+  totalParcelas?: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CriarMovimentacaoInput {
+  nome: string;
+  valor: number;
+  data: string;
+  tipo: TipoMovimentacao;
+  metodoPagamento: MetodoPagamento;
+  categoriaId: string;
+  isParcela?: boolean;
+  totalParcelas?: number;
 }
 
 export interface MovimentacaoComCategoria extends Movimentacao {

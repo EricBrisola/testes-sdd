@@ -21,7 +21,8 @@ import {
   FormRow,
   ModalFooter,
   CancelBtn,
-  SaveBtn
+  SaveBtn,
+  InstallmentNotice
 } from './styles';
 
 export interface MovimentacaoEditModalProps {
@@ -63,7 +64,10 @@ export default function MovimentacaoEditModal({
 
   useEffect(() => {
     if (movimentacao) {
-      setNome(movimentacao.nome);
+      const nomeBase = movimentacao.isParcela
+        ? movimentacao.nome.replace(/\s*\(\d+\/\d+\)$/, '').trim()
+        : movimentacao.nome;
+      setNome(nomeBase);
       setValor(movimentacao.valor);
       // Extrair formato YYYY-MM-DD
       const dataStr = typeof movimentacao.data === 'string'
@@ -146,6 +150,19 @@ export default function MovimentacaoEditModal({
             <div style={{ color: '#dc2626', fontSize: '0.875rem', fontWeight: 600 }}>
               {error}
             </div>
+          )}
+
+          {movimentacao.isParcela && (
+            <InstallmentNotice>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <span>
+                <strong>Movimentação Parcelada ({movimentacao.numeroParcela}/{movimentacao.totalParcelas}):</strong> Alterações em campos comuns serão sincronizadas para todas as parcelas, e alterar a data deslocará proporcionalmente as parcelas seguintes. A quantidade de parcelas é fixa.
+              </span>
+            </InstallmentNotice>
           )}
 
           <FormGroup>

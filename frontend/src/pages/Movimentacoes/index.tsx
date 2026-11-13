@@ -103,8 +103,17 @@ export default function MovimentacoesPage({ user, onLogout }: MovimentacoesPageP
     try {
       setDeleting(true);
       await excluirMovimentacao(itemParaExcluir.id);
-      setMovimentacoes((prev) => prev.filter((m) => m.id !== itemParaExcluir.id));
-      toast.success('Movimentação excluída com sucesso!');
+
+      if (itemParaExcluir.isParcela && itemParaExcluir.parcelamentoId) {
+        setMovimentacoes((prev) =>
+          prev.filter((m) => m.parcelamentoId !== itemParaExcluir.parcelamentoId)
+        );
+        toast.success('Todas as parcelas do parcelamento foram excluídas com sucesso!');
+      } else {
+        setMovimentacoes((prev) => prev.filter((m) => m.id !== itemParaExcluir.id));
+        toast.success('Movimentação excluída com sucesso!');
+      }
+
       setItemParaExcluir(null);
     } catch (error) {
       console.error('Erro ao excluir movimentação:', error);
@@ -115,8 +124,9 @@ export default function MovimentacoesPage({ user, onLogout }: MovimentacoesPageP
   };
 
   const handleSaveEdicao = async (id: string, payload: AtualizarMovimentacaoDTO) => {
-    const atualizada = await atualizarMovimentacao(id, payload);
-    setMovimentacoes((prev) => prev.map((m) => (m.id === id ? atualizada : m)));
+    await atualizarMovimentacao(id, payload);
+    // Recarrega os dados para sincronizar alterações em grupo e datas deslocadas
+    await carregarDados(filtros, 1);
     toast.success('Movimentação atualizada com sucesso!');
   };
 
@@ -243,6 +253,8 @@ export default function MovimentacoesPage({ user, onLogout }: MovimentacoesPageP
       <ConfirmDeleteModal
         isOpen={Boolean(itemParaExcluir)}
         itemNome={itemParaExcluir?.nome}
+        isParcela={itemParaExcluir?.isParcela}
+        totalParcelas={itemParaExcluir?.totalParcelas}
         loading={deleting}
         onConfirm={handleConfirmExcluir}
         onCancel={() => setItemParaExcluir(null)}

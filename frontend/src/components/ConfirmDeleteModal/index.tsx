@@ -12,6 +12,8 @@ import {
 export interface ConfirmDeleteModalProps {
   isOpen: boolean;
   itemNome?: string;
+  isParcela?: boolean;
+  totalParcelas?: number | null;
   loading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -20,6 +22,8 @@ export interface ConfirmDeleteModalProps {
 export default function ConfirmDeleteModal({
   isOpen,
   itemNome,
+  isParcela = false,
+  totalParcelas,
   loading = false,
   onConfirm,
   onCancel
@@ -37,11 +41,23 @@ export default function ConfirmDeleteModal({
           </svg>
         </WarningIconWrapper>
 
-        <ModalTitle>Excluir Movimentação?</ModalTitle>
+        <ModalTitle>
+          {isParcela ? 'Excluir Movimentação Parcelada?' : 'Excluir Movimentação?'}
+        </ModalTitle>
 
         <ModalMessage>
-          Tem certeza de que deseja remover a movimentação{' '}
-          <strong>"{itemNome || 'selecionada'}"</strong>? Esta ação não pode ser desfeita.
+          {isParcela ? (
+            <>
+              A movimentação <strong>"{itemNome || 'selecionada'}"</strong> faz parte de um parcelamento
+              {totalParcelas ? ` em ${totalParcelas}x` : ''}. Ao confirmar,{' '}
+              <strong>todas as parcelas vinculadas serão excluídas conjuntamente</strong>. Esta ação não pode ser desfeita.
+            </>
+          ) : (
+            <>
+              Tem certeza de que deseja remover a movimentação{' '}
+              <strong>"{itemNome || 'selecionada'}"</strong>? Esta ação não pode ser desfeita.
+            </>
+          )}
         </ModalMessage>
 
         <ModalActions>

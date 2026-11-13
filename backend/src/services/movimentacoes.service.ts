@@ -1,6 +1,7 @@
 import { PrismaClient, TipoMovimentacao, MetodoPagamento, Prisma } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 
 export class AppError extends Error {
   statusCode: number;
@@ -19,6 +20,8 @@ export interface CriarMovimentacaoDTO {
   metodoPagamento: MetodoPagamento;
   categoriaId: string;
   userId: string;
+  isParcela?: boolean;
+  totalParcelas?: number;
 }
 
 export interface ListarMovimentacoesParams {
@@ -48,7 +51,85 @@ export interface ExcluirMovimentacaoDTO {
   userId: string;
 }
 
+function calcularDataParcela(dataInicial: string | Date, offsetMeses: number): Date {
+  const d = new Date(dataInicial);
+  const diaOriginal = d.getUTCDate();
+  
+  d.setUTCMonth(d.getUTCMonth() + offsetMeses);
+  
+  // Se o mês seguinte tem menos dias (ex: 31 de jan para fev)
+  if (d.getUTCDate() !== diaOriginal) {
+    d.setUTCDate(0);
+  }
+  
+  return d;
+}
+
 export async function criarMovimentacao(data: CriarMovimentacaoDTO) {
+  if (data.valor <= 0) {
+    throw new AppError('O valor deve ser maior que zero', 400);
+  }
+
+  // Verifica existência da categoria
+  const categoria = await prisma.categoria.findFirst({
+    where: { id: data.categoriaId, userId: data.userId }
+  });
+  if (!categoria) {
+    throw new AppError('Categoria não encontrada ou não pertence ao usuário', 400);
+  }
+
+  // Fluxo de Movimentação Parcelada
+  if (data.isParcela) {
+    const totalParcelas = Number(data.totalParcelas);
+    if (isNaN(totalParcelas) || totalParcelas < 2 || totalParcelas > 24) {
+      throw new AppError('A quantidade de parcelas deve ser entre 2 e 24', 400);
+    }
+
+    const valorTotal = data.valor;
+    const valorBase = Math.floor((valorTotal / totalParcelas) * 100) / 100;
+    const somaBase = Math.round(valorBase * totalParcelas * 100) / 100;
+    const residuo = Math.round((valorTotal - somaBase) * 100) / 100;
+
+    const parcelamentoId = randomUUID();
+    const nomeBase = data.nome.trim();
+
+    const criacoes = [];
+    for (let i = 1; i <= totalParcelas; i++) {
+      const valorParcela = i === 1 ? Math.round((valorBase + residuo) * 100) / 100 : valorBase;
+      const dataParcela = calcularDataParcela(data.data, i - 1);
+
+      criacoes.push(
+        prisma.movimentacao.create({
+          data: {
+            nome: `${nomeBase} (${i}/${totalParcelas})`,
+            valor: valorParcela,
+            data: dataParcela,
+            tipo: data.tipo,
+            metodoPagamento: data.metodoPagamento,
+            categoriaId: data.categoriaId,
+            userId: data.userId,
+            isParcela: true,
+            parcelamentoId,
+            numeroParcela: i,
+            totalParcelas
+          },
+          include: {
+            categoria: {
+              select: {
+                id: true,
+                nome: true
+              }
+            }
+          }
+        })
+      );
+    }
+
+    const movimentacoesCriadas = await prisma.$transaction(criacoes);
+    return movimentacoesCriadas[0];
+  }
+
+  // Fluxo de Movimentação Única (Não parcelada)
   const [movimentacao] = await prisma.$transaction([
     prisma.movimentacao.create({
       data: {
@@ -58,7 +139,8 @@ export async function criarMovimentacao(data: CriarMovimentacaoDTO) {
         tipo: data.tipo,
         metodoPagamento: data.metodoPagamento,
         categoriaId: data.categoriaId,
-        userId: data.userId
+        userId: data.userId,
+        isParcela: false
       },
       include: {
         categoria: {
@@ -98,25 +180,23 @@ export async function listarMovimentacoes(params: ListarMovimentacoesParams) {
   if (params.dataInicial || params.dataFinal) {
     const dataFilter: Prisma.DateTimeFilter = {};
     if (params.dataInicial) {
-      const dInicio = new Date(params.dataInicial);
-      dInicio.setUTCHours(0, 0, 0, 0);
-      dataFilter.gte = dInicio;
+      dataFilter.gte = new Date(params.dataInicial);
     }
     if (params.dataFinal) {
-      const dFim = new Date(params.dataFinal);
-      dFim.setUTCHours(23, 59, 59, 999);
-      dataFilter.lte = dFim;
+      dataFilter.lte = new Date(params.dataFinal);
     }
     where.data = dataFilter;
   }
 
-  const [total, items] = await Promise.all([
+  const [total, items] = await prisma.$transaction([
     prisma.movimentacao.count({ where }),
     prisma.movimentacao.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
+      orderBy: {
+        data: 'desc'
+      },
       include: {
         categoria: {
           select: {
@@ -163,6 +243,68 @@ export async function atualizarMovimentacao(data: AtualizarMovimentacaoDTO) {
     }
   }
 
+  // Se a movimentação for parte de um parcelamento, atualiza todo o grupo em transação
+  if (existing.isParcela && existing.parcelamentoId) {
+    const grupo = await prisma.movimentacao.findMany({
+      where: {
+        parcelamentoId: existing.parcelamentoId,
+        userId: data.userId
+      },
+      orderBy: { numeroParcela: 'asc' }
+    });
+
+    let novoNomeBase = data.nome ? data.nome.trim() : undefined;
+    if (novoNomeBase) {
+      novoNomeBase = novoNomeBase.replace(/\s*\(\d+\/\d+\)$/, '').trim();
+    }
+
+    let deltaMs: number | undefined;
+    const targetIndex = existing.numeroParcela || 1;
+    if (data.data) {
+      const novaData = new Date(data.data);
+      const dataAntiga = new Date(existing.data);
+      deltaMs = novaData.getTime() - dataAntiga.getTime();
+    }
+
+    const updates = grupo.map((item) => {
+      const itemIndex = item.numeroParcela || 1;
+      const total = item.totalParcelas || grupo.length;
+
+      let itemData = item.data;
+      if (deltaMs !== undefined) {
+        if (itemIndex === targetIndex) {
+          itemData = new Date(data.data!);
+        } else if (itemIndex > targetIndex) {
+          itemData = new Date(new Date(item.data).getTime() + deltaMs);
+        }
+      }
+
+      const updateData: Prisma.MovimentacaoUpdateInput = {
+        ...(novoNomeBase ? { nome: `${novoNomeBase} (${itemIndex}/${total})` } : {}),
+        ...(data.valor !== undefined ? { valor: data.valor } : {}),
+        ...(data.tipo ? { tipo: data.tipo } : {}),
+        ...(data.metodoPagamento ? { metodoPagamento: data.metodoPagamento } : {}),
+        ...(data.categoriaId ? { categoria: { connect: { id: data.categoriaId } } } : {}),
+        ...(deltaMs !== undefined ? { data: itemData } : {})
+      };
+
+      return prisma.movimentacao.update({
+        where: { id: item.id },
+        data: updateData,
+        include: {
+          categoria: {
+            select: { id: true, nome: true }
+          }
+        }
+      });
+    });
+
+    const updatedGrupo = await prisma.$transaction(updates);
+    const updatedTarget = updatedGrupo.find((p) => p.id === data.id) || updatedGrupo[0];
+    return updatedTarget;
+  }
+
+  // Atualização de movimentação avulsa
   const updated = await prisma.movimentacao.update({
     where: { id: data.id },
     data: {
@@ -193,6 +335,18 @@ export async function excluirMovimentacao(data: ExcluirMovimentacaoDTO) {
 
   if (!existing) {
     throw new AppError('Movimentação não encontrada', 404);
+  }
+
+  if (existing.isParcela && existing.parcelamentoId) {
+    await prisma.$transaction([
+      prisma.movimentacao.deleteMany({
+        where: {
+          parcelamentoId: existing.parcelamentoId,
+          userId: data.userId
+        }
+      })
+    ]);
+    return { success: true, countDeleted: existing.totalParcelas || 1 };
   }
 
   await prisma.movimentacao.delete({

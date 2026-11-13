@@ -37,7 +37,7 @@ export default async function movimentacoesRoutes(fastify: FastifyInstance) {
 
   // POST /api/movimentacoes - Criar movimentação
   fastify.post('/', async (request: FastifyRequest, reply: FastifyReply) => {
-    const { nome, valor, data, tipo, metodoPagamento, categoriaId } = request.body as Omit<CriarMovimentacaoDTO, 'userId'>;
+    const { nome, valor, data, tipo, metodoPagamento, categoriaId, isParcela, totalParcelas } = request.body as Omit<CriarMovimentacaoDTO, 'userId'>;
     const user = request.user as { id?: string; sub?: string } | undefined;
     const userId = user?.id || user?.sub;
 
@@ -62,7 +62,9 @@ export default async function movimentacoesRoutes(fastify: FastifyInstance) {
         tipo,
         metodoPagamento,
         categoriaId,
-        userId
+        userId,
+        isParcela: Boolean(isParcela),
+        totalParcelas: totalParcelas ? Number(totalParcelas) : undefined
       });
 
       return reply.status(201).send(movimentacao);

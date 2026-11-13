@@ -3,8 +3,16 @@ import type {
   FiltrosMovimentacoesDTO,
   MovimentacaoComCategoria,
   MovimentacoesPaginadasResponse,
-  AtualizarMovimentacaoDTO
+  AtualizarMovimentacaoDTO,
+  CriarMovimentacaoInput
 } from '../types/movimentacao';
+
+export async function criarMovimentacao(
+  payload: CriarMovimentacaoInput
+): Promise<MovimentacaoComCategoria> {
+  const response = await api.post<MovimentacaoComCategoria>('/api/movimentacoes', payload);
+  return response.data;
+}
 
 export async function listarMovimentacoes(
   filtros: FiltrosMovimentacoesDTO = {}

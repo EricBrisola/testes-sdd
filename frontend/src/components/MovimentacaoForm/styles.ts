@@ -31,6 +31,49 @@ export const Row = styled.div`
   }
 `;
 
+export const DynamicFieldsRow = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  align-items: flex-start;
+
+  & > div {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  @media (max-width: 580px) {
+    flex-direction: column;
+    gap: 1rem;
+
+    & > div {
+      width: 100%;
+    }
+  }
+`;
+
+export const CheckboxContainer = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  margin-top: -0.5rem;
+  margin-bottom: -0.25rem;
+`;
+
+export const StyledCheckbox = styled.input.attrs({ type: 'checkbox' })`
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  accent-color: #3b82f6;
+`;
+
 export const CategoryRow = styled.div`
   display: flex;
   flex-direction: column;

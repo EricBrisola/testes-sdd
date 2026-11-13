@@ -11,6 +11,9 @@ import {
   SuccessMessage,
   ErrorMessage,
   Row,
+  DynamicFieldsRow,
+  CheckboxContainer,
+  StyledCheckbox,
   CategoryRow,
   CategoryEmptyLink
 } from './styles';
@@ -22,7 +25,14 @@ interface FormData {
   tipo: string;
   metodoPagamento: string;
   categoriaId: string;
+  isParcela: boolean;
+  totalParcelas: string;
 }
+
+const parcelasOptions = Array.from({ length: 23 }, (_, index) => {
+  const count = index + 2;
+  return { value: String(count), label: `${count}x` };
+});
 
 export default function MovimentacaoForm() {
   const [formData, setFormData] = useState<FormData>({
@@ -31,7 +41,9 @@ export default function MovimentacaoForm() {
     data: new Date().toISOString().split('T')[0],
     tipo: 'ENTRADA',
     metodoPagamento: 'PIX',
-    categoriaId: ''
+    categoriaId: '',
+    isParcela: false,
+    totalParcelas: '2'
   });
 
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -62,7 +74,7 @@ export default function MovimentacaoForm() {
     carregarCategorias();
   }, []);
 
-  const handleChange = (field: keyof FormData, value: string) => {
+  const handleChange = (field: keyof FormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -90,14 +102,18 @@ export default function MovimentacaoForm() {
         data: new Date(formData.data).toISOString(),
         tipo: formData.tipo,
         metodoPagamento: formData.metodoPagamento,
-        categoriaId: formData.categoriaId
+        categoriaId: formData.categoriaId,
+        isParcela: formData.isParcela,
+        totalParcelas: formData.isParcela ? Number(formData.totalParcelas) : undefined
       });
 
       setSuccess(true);
       setFormData((prev) => ({
         ...prev,
         nome: '',
-        valor: ''
+        valor: '',
+        isParcela: false,
+        totalParcelas: '2'
       }));
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
@@ -127,7 +143,15 @@ export default function MovimentacaoForm() {
         required
       />
 
-      <Row>
+      <CheckboxContainer>
+        <StyledCheckbox
+          checked={formData.isParcela}
+          onChange={(e) => handleChange('isParcela', e.target.checked)}
+        />
+        Parcelar movimentação
+      </CheckboxContainer>
+
+      <DynamicFieldsRow>
         <Input
           label="Valor (R$)"
           type="number"
@@ -138,6 +162,14 @@ export default function MovimentacaoForm() {
           onChange={(e) => handleChange('valor', e.target.value)}
           required
         />
+        {formData.isParcela && (
+          <Select
+            label="Parcelas"
+            value={formData.totalParcelas}
+            onChange={(e) => handleChange('totalParcelas', e.target.value)}
+            options={parcelasOptions}
+          />
+        )}
         <Input
           label="Data"
           type="date"
@@ -145,7 +177,7 @@ export default function MovimentacaoForm() {
           onChange={(e) => handleChange('data', e.target.value)}
           required
         />
-      </Row>
+      </DynamicFieldsRow>
 
       <CategoryRow>
         <Select
